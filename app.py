@@ -8,7 +8,7 @@ from citations.bibtex import generate_bibtex
 
 st.set_page_config(page_title="AI Research Assistant", layout="wide")
 
-st.title("📚 AI Research Assistant (Physics & ML)")
+st.title("📚 AI Research Assistant")
 st.caption("Citation-grounded literature review with BibTeX export")
 
 topic = st.text_input(
