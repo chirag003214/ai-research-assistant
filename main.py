@@ -5,9 +5,6 @@ from agents.synthesizer import synthesize
 from tools.arxiv_search import search_arxiv
 from citations.bibtex import generate_bibtex
 
-bib_path = generate_bibtex(papers)
-print(f"BibTeX saved to {bib_path}")
-
 topic = "Quantum Machine Learning for Classification"
 
 print("\n--- Planning ---")
@@ -28,3 +25,5 @@ print("\n--- Synthesizing Report ---")
 final_report = synthesize(topic)
 print(final_report)
 
+bib_path = generate_bibtex(papers)
+print(f"BibTeX saved to {bib_path}")

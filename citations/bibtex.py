@@ -15,7 +15,7 @@ def generate_bibtex(papers, filename="references.bib"):
   year={{ {p['year']} }},
   eprint={{ {p['arxiv_id']} }},
   archivePrefix={{arXiv}},
-  primaryClass={{quant-ph}},
+  primaryClass={{ {p.get('category', 'cs.AI')} }},
 }}
 """
         entries.append(entry)
