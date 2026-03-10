@@ -12,6 +12,8 @@ def add_docs(texts):
     documents.extend(texts)
 
 def retrieve(query, k=3):
+    if len(documents) == 0:
+        return ["No documents indexed yet."]
     q_emb = model.encode([query])
     _, ids = index.search(np.array(q_emb), k)
-    return [documents[i] for i in ids[0]]
+    return [documents[i] for i in ids[0] if i < len(documents)]

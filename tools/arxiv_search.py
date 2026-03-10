@@ -15,7 +15,8 @@ def search_arxiv(query, max_results=5):
             "url": r.entry_id,
             "authors": [a.name for a in r.authors],
             "year": r.published.year,
-            "arxiv_id": r.entry_id.split("/")[-1]
+            "arxiv_id": r.entry_id.split("/")[-1],
+            "category": r.primary_category
         })
     return papers
 

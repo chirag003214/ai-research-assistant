@@ -17,7 +17,8 @@ def call_llm(prompt, max_tokens=512, retries=3, wait_time=25):
     cache_file = _cache_path(prompt)
 
     if os.path.exists(cache_file):
-        return json.load(open(cache_file))["response"]
+        with open(cache_file) as f:
+            return json.load(f)["response"]
 
     for attempt in range(retries):
         try:
@@ -28,7 +29,8 @@ def call_llm(prompt, max_tokens=512, retries=3, wait_time=25):
                 max_tokens=max_tokens
             )
             text = response.choices[0].message.content
-            json.dump({"response": text}, open(cache_file, "w"))
+            with open(cache_file, "w") as f:
+                json.dump({"response": text}, f)
             return text
 
         except RateLimitError:

@@ -7,13 +7,16 @@ def read_papers(papers):
     summaries = []
 
     for paper in papers:
-        text = paper["summary"]  # later replace with full PDF text
+        text = paper.get("summary", "")
 
         equations = extract_equations(text)
         equations = [clean_latex(e) for e in equations[:3]]  # limit
 
         prompt = f"""
 Summarize the paper in 5 bullet points.
+
+Paper content:
+{text}
 
 If equations are present, explain their physical meaning briefly.
 
