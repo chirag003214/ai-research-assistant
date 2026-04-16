@@ -2,8 +2,8 @@ import re
 
 # Common LaTeX math patterns
 EQUATION_PATTERNS = [
+    r"\$\$.*?\$\$",      # display math  (must precede inline to avoid $..$ matching inside $$..$$)
     r"\$.*?\$",          # inline math
-    r"\$\$.*?\$\$",      # display math
     r"\\\[.*?\\\]",      # \[ \]
     r"\\begin{equation}.*?\\end{equation}"
 ]

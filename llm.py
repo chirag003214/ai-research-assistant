@@ -1,4 +1,4 @@
-import os, time, hashlib, json
+import os, time, hashlib, json, random
 from dotenv import load_dotenv
 from litellm import completion
 from litellm.exceptions import RateLimitError
@@ -35,8 +35,9 @@ def call_llm(prompt, max_tokens=512, retries=3, wait_time=25):
 
         except RateLimitError:
             if attempt < retries - 1:
-                print(f"Rate limit hit. Waiting {wait_time}s...")
-                time.sleep(wait_time)
+                delay = wait_time * (2 ** attempt) + random.uniform(0, 2)
+                print(f"Rate limit hit. Waiting {delay:.1f}s (attempt {attempt + 1})...")
+                time.sleep(delay)
             else:
                 raise
 

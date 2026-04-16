@@ -43,6 +43,9 @@ with tab1:
     
         with st.spinner("Searching papers…"):
             papers = search_arxiv(topic)
+            if not papers:
+                st.warning("No papers found for this topic.")
+                st.stop()
             st.subheader("📄 Papers Found")
             for p in papers:
                 st.markdown(f"- **{p['title']}** ({p['year']})")
