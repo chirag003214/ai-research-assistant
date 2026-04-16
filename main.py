@@ -22,7 +22,7 @@ crit = critique(topic)
 print(crit)
 
 print("\n--- Synthesizing Report ---")
-final_report = synthesize(topic)
+final_report = synthesize(topic, papers)  # papers from search_arxiv above
 print(final_report)
 
 bib_path = generate_bibtex(papers)

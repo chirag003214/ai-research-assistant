@@ -1,5 +1,5 @@
 from llm import call_llm
-from rag.vector_store import retrieve
+from src.pipeline import retrieve
 
 def synthesize(topic, papers):
     context = retrieve(topic, k=5)

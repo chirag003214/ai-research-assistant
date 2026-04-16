@@ -1,35 +1,37 @@
-# 🧠 AI Research Assistant
+# AI Research Assistant
 
-A multi-agent AI pipeline that automates academic literature review.
-Enter a research topic → get a structured review, gap analysis, and BibTeX export.
+An AI pipeline that automates academic literature review. Enter a research topic and get a structured review, gap analysis, and BibTeX export — all grounded in real arXiv papers.
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue)
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.32+-red)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-## How it works
+## How It Works
+
 ```
-Topic → Planner → arXiv Search → Reader (RAG) → Critic → Synthesizer → Report + BibTeX
+Topic → Planner → arXiv Search → Reader → Critic → Synthesizer → Report + BibTeX
 ```
 
-Four specialized agents collaborate via a shared FAISS vector store:
+Four sequential stages collaborate through a shared FAISS vector store:
 
-| Agent | Role |
+| Stage | What it does |
 |---|---|
-| **Planner** | Decomposes topic into focused research questions |
-| **Reader** | Summarizes papers, extracts equations, indexes into vector store |
-| **Critic** | Identifies gaps and limitations using RAG over stored summaries |
-| **Synthesizer** | Writes citation-grounded literature review |
+| **Planner** | Decomposes the topic into 4 focused research questions |
+| **Reader** | Summarizes each paper, extracts LaTeX equations, indexes summaries into FAISS |
+| **Critic** | Retrieves indexed summaries and identifies gaps, limitations, and weak methods |
+| **Synthesizer** | Writes a 5-section literature review with inline citation keys, grounded in retrieved context |
 
 ## Tech Stack
 
-- **LLM:** Groq `llama-3.1-8b-instant` via LiteLLM (swappable to GPT-4/Claude in one line)
-- **Vector search:** FAISS + `all-MiniLM-L6-v2` embeddings (384-dim)
-- **Paper source:** arXiv API
-- **UI:** Streamlit
-- **Deployment:** Render.com
+- **LLM:** Groq `llama-3.1-8b-instant` via LiteLLM (swap to any provider by changing one constant in `llm.py`)
+- **Vector search:** FAISS + `all-MiniLM-L6-v2` embeddings (384-dim, in-memory)
+- **Paper source:** arXiv API (abstract-level; full PDF extraction available via `pypdf`)
+- **Prompt caching:** LLM responses cached by MD5 hash in `cache/` — repeated runs cost zero API calls
+- **UI:** Streamlit with a Research Pipeline tab and a Retrieval Benchmark tab
+- **Deployment:** Render.com (`render.yaml` included)
 
 ## Quick Start
+
 ```bash
 git clone https://github.com/chirag003214/ai-research-assistant
 cd ai-research-assistant
@@ -37,33 +39,48 @@ cd ai-research-assistant
 pip install -r requirements.txt
 
 cp .env.example .env
-# Add your GROQ_API_KEY to .env
+# Add GROQ_API_KEY to .env
 
-streamlit run app.py
+streamlit run app.py       # UI at http://localhost:8501
+python main.py             # CLI mode (hardcoded topic)
 ```
 
-Get a free Groq API key at [console.groq.com](https://console.groq.com)
+Get a free Groq API key at [console.groq.com](https://console.groq.com).
 
-## Project Structure
-```
-agents/         — Planner, Reader, Critic, Synthesizer
-rag/            — FAISS vector store + SentenceTransformer embeddings
-tools/          — arXiv search, PDF reader
-equations/      — LaTeX equation extraction and cleaning
-citations/      — BibTeX export
-llm.py          — LLM gateway with prompt caching and retry logic
-app.py          — Streamlit UI
-```
+## Retrieval Benchmark Tab
+
+The second tab benchmarks four retrieval strategies against a live arXiv corpus:
+
+| Strategy | Method |
+|---|---|
+| Dense | FAISS cosine similarity with MiniLM embeddings |
+| Sparse | BM25 term-frequency scoring |
+| Hybrid | Reciprocal Rank Fusion (RRF) over dense + sparse |
+| Reranker | RRF followed by Cohere API or CrossEncoder second pass |
+
+Strategies run in parallel via `ThreadPoolExecutor`. Results are displayed as a comparison table, latency bar chart, and RAGAS metrics radar chart. Evaluation requires `OPENAI_API_KEY`; pass `--no-eval` to skip it.
+
+Benchmark logs append to `eval_results/eval_logs.jsonl`.
 
 ## Key Design Decisions
 
-- **Prompt caching:** LLM responses cached by MD5 hash to avoid redundant API calls
-- **RAG grounding:** Critic and Synthesizer retrieve from vector store, not raw LLM memory
-- **LiteLLM abstraction:** Swap to any LLM provider by changing one constant in `llm.py`
-- **Citation grounding:** Synthesizer builds a citation map and instructs the LLM to use real keys
+- **Prompt caching:** `call_llm()` in `llm.py` MD5-hashes each prompt and reads from disk before hitting the API. Delete `cache/` to force fresh responses.
+- **Citation grounding:** Synthesizer builds a citation map (`AuthorYear` keys) and instructs the LLM to cite every factual claim — reducing hallucination in the review.
+- **LiteLLM abstraction:** One constant (`MODEL` in `llm.py`) controls the provider. Swap to GPT-4, Claude, or any other LiteLLM-supported model without touching agent code.
+- **PDF extraction:** `tools/pdf_reader.py` provides `read_pdf(path) -> str` via pypdf, ready for the Reader agent to use with full-text PDFs.
 
-## Limitations / Future Work
+## Outputs
 
-- Currently uses arXiv abstracts only; full PDF parsing is the next step (`pypdf` is in requirements)
-- Vector store is in-memory (reset on restart); would replace with ChromaDB for persistence
-- Pipeline runs sequentially; parallelizing the reader with `ThreadPoolExecutor` would cut latency ~60%
+| File | Contents |
+|---|---|
+| `citations/<topic>.bib` | BibTeX entries for all retrieved papers |
+| `cache/<md5>.json` | Cached LLM responses |
+| `eval_results/eval_logs.jsonl` | Benchmark evaluation logs |
+
+## Future Work
+
+- Wire `pdf_reader` into the Reader agent for full-text extraction instead of abstracts only
+- Persist the vector store with ChromaDB (currently in-memory, reset on restart)
+- Parallelize the Reader stage with `ThreadPoolExecutor` to cut latency ~60%
+- Add self-correction loops (CRAG-style) where the Critic can trigger re-retrieval
+- Replace the RAGAS benchmark's dummy answers with real LLM-generated responses

@@ -1,5 +1,5 @@
 from llm import call_llm
-from rag.vector_store import add_docs
+from src.pipeline import add_docs
 from equations.extractor import extract_equations
 from equations.latex_cleaner import clean_latex
 
