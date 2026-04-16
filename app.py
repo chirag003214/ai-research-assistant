@@ -13,6 +13,7 @@ from agents.critic import critique
 from agents.synthesizer import synthesize
 from tools.arxiv_search import search_arxiv
 from citations.bibtex import generate_bibtex
+from rag.vector_store import store
 from src.pipeline import run_retrieval_benchmark
 
 # Parse --no-eval flag if given
@@ -33,6 +34,8 @@ with tab1:
     )
     
     if st.button("Run Research Pipeline") and topic:
+        store.reset()
+
         with st.spinner("Planning research…"):
             plan = plan_research(topic)
             st.subheader("🧠 Research Plan")

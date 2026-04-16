@@ -1,8 +1,17 @@
 from llm import call_llm
-from rag.vector_store import retrieve
+from rag.vector_store import store
+
 
 def critique(topic):
-    context = retrieve(topic)
+    chunks = store.retrieve(topic)
+
+    if not chunks:
+        context = "No documents indexed yet."
+    else:
+        context = "\n\n".join(
+            f"[{c['title']} ({c['year']})]: {c['text']}"
+            for c in chunks
+        )
 
     prompt = f"""
 You are a peer reviewer.
@@ -17,4 +26,3 @@ Identify:
 (max 150 words)
 """
     return call_llm(prompt, max_tokens=300)
-
