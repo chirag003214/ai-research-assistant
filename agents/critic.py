@@ -3,7 +3,7 @@ from rag.vector_store import store
 
 
 def critique(topic):
-    chunks = store.retrieve(topic)
+    chunks = store.hybrid_retrieve(topic)
 
     if not chunks:
         context = "No documents indexed yet."

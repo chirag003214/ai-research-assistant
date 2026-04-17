@@ -1,16 +1,15 @@
 import re
 
-# Common LaTeX math patterns
-EQUATION_PATTERNS = [
-    r"\$\$.*?\$\$",      # display math  (must precede inline to avoid $..$ matching inside $$..$$)
-    r"\$.*?\$",          # inline math
-    r"\\\[.*?\\\]",      # \[ \]
-    r"\\begin{equation}.*?\\end{equation}"
-]
+# Single alternation regex: $$ must appear before $ so the engine
+# commits to display math before trying inline, preventing $$ from
+# being split into two empty inline matches.
+_EQUATION_RE = re.compile(
+    r"\$\$.*?\$\$"
+    r"|\$.*?\$"
+    r"|\\\[.*?\\\]"
+    r"|\\begin\{equation\}.*?\\end\{equation\}",
+    re.DOTALL,
+)
 
 def extract_equations(text):
-    equations = []
-    for pattern in EQUATION_PATTERNS:
-        matches = re.findall(pattern, text, re.DOTALL)
-        equations.extend(matches)
-    return list(set(equations))
+    return list(set(_EQUATION_RE.findall(text)))

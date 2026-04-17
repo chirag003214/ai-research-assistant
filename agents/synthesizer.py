@@ -10,7 +10,7 @@ def _citation_key(chunk: dict) -> str:
 
 
 def synthesize(topic, papers=None):
-    chunks = store.retrieve(topic, k=5)
+    chunks = store.hybrid_retrieve(topic, k=5)
 
     if not chunks:
         context = "No documents indexed yet."
