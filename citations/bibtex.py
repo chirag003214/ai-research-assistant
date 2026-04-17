@@ -3,7 +3,7 @@ import os
 BIB_DIR = "outputs"
 os.makedirs(BIB_DIR, exist_ok=True)
 
-def generate_bibtex(papers, filename="references.bib"):
+def generate_bibtex(papers: list[dict], filename: str = "references.bib") -> str:
     # --- pass 1: build raw keys ---
     raw_keys = []
     for p in papers:

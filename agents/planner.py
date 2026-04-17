@@ -1,6 +1,6 @@
 from llm import call_llm
 
-def plan_research(topic):
+def plan_research(topic: str) -> str:
     prompt = f"""
 Break the research topic into 4 focused research questions.
 Topic: {topic}

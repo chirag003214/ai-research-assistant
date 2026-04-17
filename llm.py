@@ -13,7 +13,7 @@ def _cache_path(prompt):
     key = hashlib.md5(prompt.encode()).hexdigest()
     return os.path.join(CACHE_DIR, f"{key}.json")
 
-def call_llm(prompt, max_tokens=512, retries=3, wait_time=25):
+def call_llm(prompt: str, max_tokens: int = 512, retries: int = 3, wait_time: int = 25) -> str:
     cache_file = _cache_path(prompt)
 
     if os.path.exists(cache_file):

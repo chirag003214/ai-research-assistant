@@ -9,7 +9,7 @@ def _citation_key(chunk: dict) -> str:
     return f"{last_name}{chunk.get('year', '')}"
 
 
-def synthesize(topic, papers=None):
+def synthesize(topic: str, papers: list[dict] | None = None) -> str:
     chunks = store.hybrid_retrieve(topic, k=5)
 
     if not chunks:

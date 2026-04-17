@@ -2,7 +2,7 @@ from llm import call_llm
 from rag.vector_store import store
 
 
-def critique(topic):
+def critique(topic: str) -> str:
     chunks = store.hybrid_retrieve(topic)
 
     if not chunks:

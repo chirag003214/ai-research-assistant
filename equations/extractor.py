@@ -11,5 +11,5 @@ _EQUATION_RE = re.compile(
     re.DOTALL,
 )
 
-def extract_equations(text):
+def extract_equations(text: str) -> list[str]:
     return list(set(_EQUATION_RE.findall(text)))

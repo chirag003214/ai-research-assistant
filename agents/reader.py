@@ -4,7 +4,7 @@ from equations.extractor import extract_equations
 from equations.latex_cleaner import clean_latex
 
 
-def read_papers(papers):
+def read_papers(papers: list[dict]) -> list[dict]:
     summaries = []
 
     for paper in papers:

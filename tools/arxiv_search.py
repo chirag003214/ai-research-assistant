@@ -1,6 +1,6 @@
 import arxiv
 
-def search_arxiv(query, max_results=5):
+def search_arxiv(query: str, max_results: int = 5) -> list[dict]:
     try:
         search = arxiv.Search(
             query=query,
